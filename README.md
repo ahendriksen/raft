@@ -3,17 +3,21 @@
 ## Investigation of compile times
 
 The goal of this branch is to investigate how compilation times are impacted by
-various design decisions. This has been done in a series of commits: 
+various design decisions. We have picked a single translation unit
+(`l1_float_float_float_int.cu`) and compiled for a single architecture (SM 70).
+Compile times are tracked over a series of commits:
 
-- [dfc1274e1](https://github.com/ahendriksen/raft/commit/dfc1274e1) 20.2s : Add baseline compile time
-- [069df315a](https://github.com/ahendriksen/raft/commit/069df315a) 17.8s : Remove cutlass includes
-- [09a39e7f2](https://github.com/ahendriksen/raft/commit/09a39e7f2) 12.7s : Only compile the kernel dispatch code
-- [631ecd8ac](https://github.com/ahendriksen/raft/commit/631ecd8ac) 11.9s : Minimize header files
-- [8ff45bc00](https://github.com/ahendriksen/raft/commit/8ff45bc00)  5.7s : Do not include rmm
-- [ce07d6d1e](https://github.com/ahendriksen/raft/commit/ce07d6d1e) 10.4s : Add back spdlog
-- [90c8e07c6](https://github.com/ahendriksen/raft/commit/90c8e07c6) 11.2s : Add back rmm
-- [c47299975](https://github.com/ahendriksen/raft/commit/c47299975)  4.8s : Remove string and exceptions
-- [cf47e5df2](https://github.com/ahendriksen/raft/commit/cf47e5df2)  2.8s : pragma unroll 1
+| Commit                                                            | Compilation time | Message                               |
+|:------------------------------------------------------------------|------------------|---------------------------------------|
+| [dfc1274e1](https://github.com/ahendriksen/raft/commit/dfc1274e1) | 20.2s            | Add baseline compile time             |
+| [069df315a](https://github.com/ahendriksen/raft/commit/069df315a) | 17.8s            | Remove cutlass includes               |
+| [09a39e7f2](https://github.com/ahendriksen/raft/commit/09a39e7f2) | 12.7s            | Only compile the kernel dispatch code |
+| [631ecd8ac](https://github.com/ahendriksen/raft/commit/631ecd8ac) | 11.9s            | Minimize header files                 |
+| [8ff45bc00](https://github.com/ahendriksen/raft/commit/8ff45bc00) | 5.7s             | Do not include rmm                    |
+| [ce07d6d1e](https://github.com/ahendriksen/raft/commit/ce07d6d1e) | 10.4s            | Add back spdlog                       |
+| [90c8e07c6](https://github.com/ahendriksen/raft/commit/90c8e07c6) | 11.2s            | Add back rmm                          |
+| [c47299975](https://github.com/ahendriksen/raft/commit/c47299975) | 4.8s             | Remove string and exceptions          |
+| [cf47e5df2](https://github.com/ahendriksen/raft/commit/cf47e5df2) | 2.8s             | pragma unroll 1                       |
 
 Using `nvcc`'s `--time` option, we can get an overview of where the time is spent during compilation:
 
