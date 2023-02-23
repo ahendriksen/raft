@@ -44,7 +44,7 @@
  * Compile with:
  *
  * time nvcc \
-   --time=../../nvcc_compile_02_only_kernel_dispatch.csv \
+   --time=../../nvcc_compile_03_minimize_cuda_utils.csv \
    -forward-unknown-to-host-compiler -DCUTLASS_NAMESPACE=raft_cutlass \
    -DFMT_HEADER_ONLY=1 -DNVTX_ENABLED -DRAFT_SYSTEM_LITTLE_ENDIAN=1 -DSPDLOG_FMT_EXTERNAL \
    -DTHRUST_DEVICE_SYSTEM=THRUST_DEVICE_SYSTEM_CUDA -DTHRUST_HOST_SYSTEM=THRUST_HOST_SYSTEM_CPP \
@@ -72,22 +72,21 @@
    -c /home/ahendriksen/projects/raft-spdlog-issue/cpp/src/distance/distance/specializations/detail/l1_float_float_float_int.cu \
    -o CMakeFiles/raft_distance_lib.dir/src/distance/distance/specializations/detail/l1_float_float_float_int.cu.o
  *
-real    0m12.710s
-user    0m11.686s
-sys     0m1.016s
+real    0m11.944s
+user    0m11.078s
+sys     0m0.863s
 
- * python -c 'import pandas as pd; print(pd.read_csv("../../nvcc_compile_02_only_kernel_dispatch.csv").rename(columns=str.strip)[["phase name", "metric", "unit"]].sort_values("metric"))'
+ * python -c 'import pandas as pd; print(pd.read_csv("../../nvcc_compile_03_minimize_cuda_utils.csv").rename(columns=str.strip)[["phase name", "metric", "unit"]].sort_values("metric"))'
 
                 phase name     metric unit
-4               fatbinary     36.8780   ms
-7           nvcc (driver)     38.5693   ms
-1   gcc (preprocessing 4)    323.2190   ms
-0   gcc (preprocessing 1)    342.6680   ms
-3                   ptxas    775.6400   ms
-5                cudafe++   1716.8469   ms
-6         gcc (compiling)   3473.7361   ms
-2                    cicc   5933.3281   ms
-
+7           nvcc (driver)     17.9209   ms
+4               fatbinary     37.1010   ms
+1   gcc (preprocessing 4)    322.1390   ms
+0   gcc (preprocessing 1)    354.7470   ms
+3                   ptxas    786.6200   ms
+5                cudafe++   1553.0959   ms
+6         gcc (compiling)   3230.7720   ms
+2                    cicc   5573.9248   ms
  */
 
 namespace raft {

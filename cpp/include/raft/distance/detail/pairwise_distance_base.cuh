@@ -17,6 +17,7 @@
 #include <raft/core/operators.hpp>
 #include <raft/linalg/contractions.cuh>
 #include <raft/util/cuda_utils.cuh>
+#include <raft/core/cudart_utils.hpp>
 
 
 namespace raft {
