@@ -5,7 +5,8 @@
 The goal of this branch is to investigate how compilation times are impacted by
 various design decisions. We have picked a single translation unit
 (`l1_float_float_float_int.cu`) and compiled for a single architecture (SM 70).
-Compile times are tracked over a series of commits:
+This demonstrates how compile times can be **reduced from 20s to 2.8s** in
+several steps. Compile times are tracked over a series of commits:
 
 | Commit                                                            | Compilation time | Message                               |
 |:------------------------------------------------------------------|------------------|---------------------------------------|
