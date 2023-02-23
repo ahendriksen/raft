@@ -189,9 +189,9 @@ struct PairwiseDistances : public BaseClass {
   DI void reset_accumulator()
   {
     // Reset accumulator registers to zero.
-#pragma unroll
+#pragma unroll 1
     for (int i = 0; i < P::AccRowsPerTh; ++i) {
-#pragma unroll
+#pragma unroll 1
       for (int j = 0; j < P::AccColsPerTh; ++j) {
         acc[i][j] = BaseClass::Zero;
       }
@@ -200,14 +200,14 @@ struct PairwiseDistances : public BaseClass {
 
   DI void accumulate()
   {
-#pragma unroll
+#pragma unroll 1
     for (int ki = 0; ki < P::Kblk; ki += P::Veclen) {
       this->ldsXY(ki);
-#pragma unroll
+#pragma unroll 1
       for (int i = 0; i < P::AccRowsPerTh; ++i) {
-#pragma unroll
+#pragma unroll 1
         for (int j = 0; j < P::AccColsPerTh; ++j) {
-#pragma unroll
+#pragma unroll 1
           for (int v = 0; v < P::Veclen; ++v) {
             core_op(acc[i][j], this->regx[i][v], this->regy[j][v]);
           }
@@ -238,11 +238,11 @@ struct PairwiseDistances : public BaseClass {
     }
     __syncthreads();
 
-#pragma unroll
+#pragma unroll 1
     for (int i = 0; i < P::AccRowsPerTh; ++i) {
       regxn[i] = sxNorm[i * P::AccThRows + (threadIdx.x / P::AccThCols)];
     }
-#pragma unroll
+#pragma unroll 1
     for (int i = 0; i < P::AccColsPerTh; ++i) {
       regyn[i] = syNorm[i * P::AccThCols + (threadIdx.x % P::AccThCols)];
     }
@@ -253,10 +253,10 @@ struct PairwiseDistances : public BaseClass {
     IdxT starty = tile_idx_m + this->accrowid;
     IdxT startx = tile_idx_n + this->acccolid;
 
-#pragma unroll
+#pragma unroll 1
     for (int i = 0; i < P::AccRowsPerTh; ++i) {
       auto rowId = starty + i * P::AccThRows;
-#pragma unroll
+#pragma unroll 1
       for (int j = 0; j < P::AccColsPerTh; ++j) {
         auto colId = startx + j * P::AccThCols;
         if (rowId < this->m && colId < this->n) {
