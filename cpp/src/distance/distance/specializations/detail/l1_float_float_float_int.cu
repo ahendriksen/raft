@@ -40,7 +40,7 @@
  * Compile with:
  *
  * time nvcc \
-   --time=../../nvcc_compile_full.csv \
+   --time=../../nvcc_compile_01_no_cutlass.csv \
    -forward-unknown-to-host-compiler -DCUTLASS_NAMESPACE=raft_cutlass \
    -DFMT_HEADER_ONLY=1 -DNVTX_ENABLED -DRAFT_SYSTEM_LITTLE_ENDIAN=1 -DSPDLOG_FMT_EXTERNAL \
    -DTHRUST_DEVICE_SYSTEM=THRUST_DEVICE_SYSTEM_CUDA -DTHRUST_HOST_SYSTEM=THRUST_HOST_SYSTEM_CPP \
@@ -68,21 +68,21 @@
    -c /home/ahendriksen/projects/raft-spdlog-issue/cpp/src/distance/distance/specializations/detail/l1_float_float_float_int.cu \
    -o CMakeFiles/raft_distance_lib.dir/src/distance/distance/specializations/detail/l1_float_float_float_int.cu.o
  *
- * real    0m20.184s
- * user    0m18.713s
- * sys     0m1.441s
- *
- * python -c 'import pandas as pd; print(pd.read_csv("../../nvcc_compile_full.csv").rename(columns=str.strip)[["phase name", "metric", "unit"]].sort_values("metric"))'
- *
- *                 phase name     metric unit
- * 4               fatbinary     35.7960   ms
- * 7           nvcc (driver)     57.6406   ms
- * 1   gcc (preprocessing 4)    657.9370   ms
- * 0   gcc (preprocessing 1)    672.9990   ms
- * 3                   ptxas    767.4330   ms
- * 5                cudafe++   3136.6760   ms
- * 6         gcc (compiling)   6988.9419   ms
- * 2                    cicc   7786.4458   ms
+real    0m17.763s
+user    0m16.585s
+sys     0m1.171s
+
+ * python -c 'import pandas as pd; print(pd.read_csv("../../nvcc_compile_01_no_cutlass.csv").rename(columns=str.strip)[["phase name", "metric", "unit"]].sort_values("metric"))'
+
+                phase name     metric unit
+4               fatbinary     33.8850   ms
+7           nvcc (driver)     47.3730   ms
+1   gcc (preprocessing 4)    464.6270   ms
+0   gcc (preprocessing 1)    488.5670   ms
+3                   ptxas    777.0000   ms
+5                cudafe++   2512.4312   ms
+6         gcc (compiling)   6226.6230   ms
+2                    cicc   7146.8901   ms
  */
 
 namespace raft {

@@ -249,54 +249,10 @@ void distance_impl(raft::resources const& handle,
       norm_A, x, k, m, raft::linalg::L2Norm, is_row_major, stream, raft::sqrt_op{});
   }
 
-  // On CUDA 12:
-  // - always execute normal kernel
-  //
-  // On CUDA 11 and below:
-  // - execute CUTLASS-based kernel on SM_80 and above
-  // - execute normal kernel otherwise.
-
-  if constexpr (__CUDACC_VER_MAJOR__ == 12) {
-    // Always execute legacy kernels on CUDA 12
-    ops::cosine_distance_op<DataT, AccT, IdxT> distance_op{};
-    distance_matrix_dispatch<decltype(distance_op), DataT, AccT, OutT, FinOpT, IdxT>(
-      distance_op, m, n, k, x, y, norm_A, norm_B, out, fin_op, stream, is_row_major);
-  } else {
-    auto runtime_arch  = raft::arch::kernel_runtime_arch();
-    auto cutlass_range = raft::arch::SM_range(raft::arch::SM_80(), raft::arch::SM_future());
-    auto legacy_range  = raft::arch::SM_range(raft::arch::SM_min(), raft::arch::SM_80());
-
-    if (cutlass_range.contains(runtime_arch)) {
-      // If device is SM_80 or later, use CUTLASS-based kernel.
-      using Op = ops::cosine_cutlass_op<DataT, AccT>;
-      Op distance_op{};
-
-      distance_matrix_cutlass_dispatch<decltype(distance_op), DataT, AccT, OutT, FinOpT, IdxT>(
-        distance_op, m, n, k, x, y, norm_A, norm_B, out, fin_op, stream, is_row_major);
-    } else {
-      // Else use "legacy" L2
-      ops::cosine_distance_op<DataT, AccT, IdxT> distance_op{};
-      distance_matrix_dispatch<decltype(distance_op),
-                               DataT,
-                               AccT,
-                               OutT,
-                               FinOpT,
-                               IdxT,
-                               decltype(legacy_range)>(distance_op,
-                                                       m,
-                                                       n,
-                                                       k,
-                                                       x,
-                                                       y,
-                                                       norm_A,
-                                                       norm_B,
-                                                       out,
-                                                       fin_op,
-                                                       stream,
-                                                       is_row_major,
-                                                       legacy_range);
-    }
-  }
+  // Always execute legacy kernels
+  ops::cosine_distance_op<DataT, AccT, IdxT> distance_op{};
+  distance_matrix_dispatch<decltype(distance_op), DataT, AccT, OutT, FinOpT, IdxT>(
+    distance_op, m, n, k, x, y, norm_A, norm_B, out, fin_op, stream, is_row_major);
 }
 
 template <typename DataT, typename AccT, typename OutT, typename FinOpT, typename IdxT = int>
@@ -534,45 +490,10 @@ void distance_impl_l2_expanded(  // NOTE: different name
     raft::linalg::rowNorm(
       norm_A, x, k, m, raft::linalg::L2Norm, is_row_major, stream, raft::identity_op{});
   }
-
-  // On CUDA 12:
-  // - always execute normal kernel
-  //
-  // On CUDA 11 and below:
-  // - execute CUTLASS-based kernel on SM_80 and above
-  // - execute normal kernel otherwise.
-
-  if constexpr (__CUDACC_VER_MAJOR__ == 12) {
-    // Always execute legacy kernels on CUDA 12
-    ops::l2_exp_distance_op<DataT, AccT, IdxT> l2_op(perform_sqrt);
-    distance_matrix_dispatch<decltype(l2_op), DataT, AccT, OutT, FinOpT, IdxT>(
-      l2_op, m, n, k, x, y, norm_A, norm_B, out, fin_op, stream, is_row_major);
-  } else {
-    auto runtime_arch  = raft::arch::kernel_runtime_arch();
-    auto cutlass_range = raft::arch::SM_range(raft::arch::SM_80(), raft::arch::SM_future());
-    auto legacy_range  = raft::arch::SM_range(raft::arch::SM_min(), raft::arch::SM_80());
-
-    if (cutlass_range.contains(runtime_arch)) {
-      // If device is SM_80 or later, use CUTLASS-based kernel.
-      using L2Op = ops::l2_exp_cutlass_op<DataT, AccT>;
-      L2Op l2_op(perform_sqrt);
-
-      distance_matrix_cutlass_dispatch<decltype(l2_op), DataT, AccT, OutT, FinOpT, IdxT>(
-        l2_op, m, n, k, x, y, norm_A, norm_B, out, fin_op, stream, is_row_major);
-    } else {
-      // Else use "legacy" L2. Compile *only* for architectures in the legacy
-      // range. For newer architectures, compile empty kernels.
-      ops::l2_exp_distance_op<DataT, AccT, IdxT> l2_op(perform_sqrt);
-      distance_matrix_dispatch<decltype(l2_op),
-                               DataT,
-                               AccT,
-                               OutT,
-                               FinOpT,
-                               IdxT,
-                               decltype(legacy_range)>(
-        l2_op, m, n, k, x, y, norm_A, norm_B, out, fin_op, stream, is_row_major, legacy_range);
-    }
-  }
+  // Always execute legacy kernels
+  ops::l2_exp_distance_op<DataT, AccT, IdxT> l2_op(perform_sqrt);
+  distance_matrix_dispatch<decltype(l2_op), DataT, AccT, OutT, FinOpT, IdxT>(
+    l2_op, m, n, k, x, y, norm_A, norm_B, out, fin_op, stream, is_row_major);
 }
 
 template <typename DataT, typename AccT, typename OutT, typename FinOpT, typename IdxT = int>
