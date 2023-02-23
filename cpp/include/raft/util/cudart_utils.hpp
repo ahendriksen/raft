@@ -26,10 +26,6 @@
 
 #include <cassert>
 #include <raft/core/error.hpp>
-#include <rmm/cuda_stream_view.hpp>
-#include <rmm/mr/device/managed_memory_resource.hpp>
-#include <rmm/mr/device/per_device_resource.hpp>
-#include <rmm/mr/device/pool_memory_resource.hpp>
 
 namespace raft {
 
