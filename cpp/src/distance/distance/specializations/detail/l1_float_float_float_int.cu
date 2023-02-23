@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-#include <raft/distance/detail/distance.cuh>
+#include <raft/core/operators.hpp>
+#include <raft/distance/detail/distance_ops/l1.cuh>
+#include <raft/distance/detail/pairwise_matrix/dispatch.cuh>
+#include <raft/util/arch.cuh>
+#include <raft/util/cuda_utils.cuh>
 
 /*
  * Configure with:
@@ -40,7 +44,7 @@
  * Compile with:
  *
  * time nvcc \
-   --time=../../nvcc_compile_01_no_cutlass.csv \
+   --time=../../nvcc_compile_02_only_kernel_dispatch.csv \
    -forward-unknown-to-host-compiler -DCUTLASS_NAMESPACE=raft_cutlass \
    -DFMT_HEADER_ONLY=1 -DNVTX_ENABLED -DRAFT_SYSTEM_LITTLE_ENDIAN=1 -DSPDLOG_FMT_EXTERNAL \
    -DTHRUST_DEVICE_SYSTEM=THRUST_DEVICE_SYSTEM_CUDA -DTHRUST_HOST_SYSTEM=THRUST_HOST_SYSTEM_CPP \
@@ -68,38 +72,50 @@
    -c /home/ahendriksen/projects/raft-spdlog-issue/cpp/src/distance/distance/specializations/detail/l1_float_float_float_int.cu \
    -o CMakeFiles/raft_distance_lib.dir/src/distance/distance/specializations/detail/l1_float_float_float_int.cu.o
  *
-real    0m17.763s
-user    0m16.585s
-sys     0m1.171s
+real    0m12.710s
+user    0m11.686s
+sys     0m1.016s
 
- * python -c 'import pandas as pd; print(pd.read_csv("../../nvcc_compile_01_no_cutlass.csv").rename(columns=str.strip)[["phase name", "metric", "unit"]].sort_values("metric"))'
+ * python -c 'import pandas as pd; print(pd.read_csv("../../nvcc_compile_02_only_kernel_dispatch.csv").rename(columns=str.strip)[["phase name", "metric", "unit"]].sort_values("metric"))'
 
                 phase name     metric unit
-4               fatbinary     33.8850   ms
-7           nvcc (driver)     47.3730   ms
-1   gcc (preprocessing 4)    464.6270   ms
-0   gcc (preprocessing 1)    488.5670   ms
-3                   ptxas    777.0000   ms
-5                cudafe++   2512.4312   ms
-6         gcc (compiling)   6226.6230   ms
-2                    cicc   7146.8901   ms
+4               fatbinary     36.8780   ms
+7           nvcc (driver)     38.5693   ms
+1   gcc (preprocessing 4)    323.2190   ms
+0   gcc (preprocessing 1)    342.6680   ms
+3                   ptxas    775.6400   ms
+5                cudafe++   1716.8469   ms
+6         gcc (compiling)   3473.7361   ms
+2                    cicc   5933.3281   ms
+
  */
 
 namespace raft {
 namespace distance {
 namespace detail {
-template void distance<raft::distance::DistanceType::L1, float, float, float, int>(
-  raft::resources const& handle,
-  const float* x,
-  const float* y,
-  float* dist,
-  int m,
-  int n,
-  int k,
-  void* workspace,
-  std::size_t worksize,
-  bool isRowMajor,
-  float metric_arg);
+
+  using DataT = float;
+  using AccT = float;
+  using OutT = float;
+  using IdxT = int;
+  using OpT = ops::l1_distance_op<DataT, AccT, IdxT>;
+  using FinOpT = decltype(raft::identity_op());
+  using SM_compat_t = raft::arch::SM_range<raft::arch::SM_min, raft::arch::SM_future>;
+
+  template void distance_matrix_dispatch<OpT, DataT, AccT, OutT, FinOpT, IdxT, SM_compat_t>(
+    OpT distance_op,
+    int m,
+    int n,
+    int k,
+    const DataT* x,
+    const DataT* y,
+    const DataT* x_norm,
+    const DataT* y_norm,
+    OutT* out,
+    FinOpT fin_op,
+    cudaStream_t stream,
+    bool is_row_major,
+    SM_compat_t sm_compat_range);
 
 }  // namespace detail
 }  // namespace distance
