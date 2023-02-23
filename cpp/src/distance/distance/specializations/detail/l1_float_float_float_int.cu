@@ -13,13 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#include <spdlog/spdlog.h>
-
-#include <rmm/cuda_stream_view.hpp>
-#include <rmm/mr/device/managed_memory_resource.hpp>
-#include <rmm/mr/device/per_device_resource.hpp>
-
 #include <raft/core/operators.hpp>
 #include <raft/distance/detail/distance_ops/l1.cuh>
 #include <raft/distance/detail/pairwise_matrix/dispatch.cuh>
@@ -50,7 +43,7 @@
  * Compile with:
  *
  * time nvcc \
-   --time=../../nvcc_compile_06_add_back_spdlog_rmm.csv \
+   --time=../../nvcc_compile_07_no_string_exception.csv \
    -forward-unknown-to-host-compiler -DCUTLASS_NAMESPACE=raft_cutlass \
    -DFMT_HEADER_ONLY=1 -DNVTX_ENABLED -DRAFT_SYSTEM_LITTLE_ENDIAN=1 -DSPDLOG_FMT_EXTERNAL \
    -DTHRUST_DEVICE_SYSTEM=THRUST_DEVICE_SYSTEM_CUDA -DTHRUST_HOST_SYSTEM=THRUST_HOST_SYSTEM_CPP \
@@ -78,21 +71,21 @@
    -c /home/ahendriksen/projects/raft-spdlog-issue/cpp/src/distance/distance/specializations/detail/l1_float_float_float_int.cu \
    -o CMakeFiles/raft_distance_lib.dir/src/distance/distance/specializations/detail/l1_float_float_float_int.cu.o
  *
-real    0m11.167s
-user    0m10.287s
-sys     0m0.850s
+real    0m4.842s
+user    0m4.483s
+sys     0m0.332s
 
- * python -c 'import pandas as pd; print(pd.read_csv("../../nvcc_compile_06_add_back_spdlog_rmm.csv").rename(columns=str.strip)[["phase name", "metric", "unit"]].sort_values("metric"))'
+ * python -c 'import pandas as pd; print(pd.read_csv("../../nvcc_compile_07_no_string_exception.csv").rename(columns=str.strip)[["phase name", "metric", "unit"]].sort_values("metric"))'
 
                 phase name     metric unit
-7           nvcc (driver)     12.8721   ms
-4               fatbinary     17.4800   ms
-1   gcc (preprocessing 4)    261.1260   ms
-0   gcc (preprocessing 1)    272.9400   ms
-3                   ptxas    808.0450   ms
-5                cudafe++   1209.5320   ms
-6         gcc (compiling)   3053.5229   ms
-2                    cicc   5462.3179   ms
+7           nvcc (driver)     18.9209   ms
+4               fatbinary     34.7810   ms
+1   gcc (preprocessing 4)    167.9720   ms
+0   gcc (preprocessing 1)    196.7850   ms
+5                cudafe++    427.0700   ms
+6         gcc (compiling)    646.8200   ms
+3                   ptxas    792.5420   ms
+2                    cicc   2492.8889   ms
  */
 
 namespace raft {

@@ -15,7 +15,6 @@
  */
 #pragma once
 
-#include <cstddef>
 #include <raft/core/operators.hpp>
 #include <raft/distance/detail/pairwise_distance_base.cuh>
 #include <raft/util/arch.cuh>

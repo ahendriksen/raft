@@ -15,6 +15,7 @@
  */
 #pragma once
 
+#include <cassert>
 #include "kernel_sm60.cuh"
 #include <raft/linalg/contractions.cuh>
 #include <raft/util/arch.cuh>
@@ -123,8 +124,8 @@ void distance_matrix_dispatch(
 
   // Since alignment is in bytes, it could be smaller than sizeof(DataT).
   // Handle this (unlikely) case here.
-  RAFT_EXPECTS(sizeof(DataT) <= byte_alignment,
-               "Input matrix must be aligned to size of elements.");
+  assert(sizeof(DataT) <= byte_alignment &&
+         "Input matrix must be aligned to size of elements.");
 
   // Compute number of elements that can be loaded in one instruction
   // without causing misalignent errors.

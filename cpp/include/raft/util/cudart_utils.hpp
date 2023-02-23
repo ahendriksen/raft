@@ -24,20 +24,8 @@
 
 #pragma once
 
+#include <cstdio>
 #include <cassert>
-#include <raft/core/error.hpp>
-
-namespace raft {
-
-/**
- * @brief Exception thrown when a CUDA error is encountered.
- */
-struct cuda_error : public raft::exception {
-  explicit cuda_error(char const* const message) : raft::exception(message) {}
-  explicit cuda_error(std::string const& message) : raft::exception(message) {}
-};
-
-}  // namespace raft
 
 /**
  * @brief Error checking macro for CUDA runtime API functions.
@@ -52,22 +40,29 @@ struct cuda_error : public raft::exception {
     cudaError_t const status = call;               \
     if (status != cudaSuccess) {                   \
       cudaGetLastError();                          \
-      std::string msg{};                           \
-      SET_ERROR_MSG(msg,                           \
-                    "CUDA error encountered at: ", \
-                    "call='%s', Reason=%s:%s",     \
-                    #call,                         \
-                    cudaGetErrorName(status),      \
-                    cudaGetErrorString(status));   \
-      throw raft::cuda_error(msg);                 \
+      std::printf("CUDA error encountered at: "    \
+                  "call='%s', Reason=%s:%s",       \
+                  #call,                           \
+                  cudaGetErrorName(status),        \
+                  cudaGetErrorString(status));     \
+      assert(0);                                   \
     }                                              \
   } while (0)
 
-// FIXME: Remove after consumers rename
-#ifndef CUDA_TRY
-#define CUDA_TRY(call) RAFT_CUDA_TRY(call)
-#endif
-
+/**
+ * @brief Macro for checking (pre-)conditions that throws an exception when a condition is false
+ *
+ * @param[in] cond Expression that evaluates to true or false
+ * @param[in] fmt String literal description of the reason that cond is expected to be true with
+ * optional format tagas
+ * @throw raft::logic_error if the condition evaluates to false.
+ */
+#define RAFT_EXPECTS(cond, fmt, ...)                              \
+  do {                                                            \
+    if (!(cond)) {                                                \
+      assert(0);                                                  \
+    }                                                             \
+  } while (0)
 
 namespace raft {
 
