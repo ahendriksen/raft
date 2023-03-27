@@ -22,12 +22,12 @@
 namespace raft::bench::distance::tune {
 
 // Distance op
-using OpT                  = raft::distance::detail::ops::lp_unexp_distance_op<DataT, AccT, IdxT>;
-constexpr float metric_arg = 2.0;
-OpT distance_op{metric_arg};
+using OpT = raft::distance::detail::ops::l1_distance_op<DataT, AccT, IdxT>;
+// constexpr float metric_arg = 2.0;
+OpT distance_op{};
 
 // Kernel policy
-constexpr int vec_len = 1;
+constexpr int vec_len = 4;
 using Policy          = typename raft::linalg::Policy4x4<DataT, vec_len>::Policy;
 
 // Architecture

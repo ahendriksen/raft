@@ -200,7 +200,7 @@ struct PairwiseDistances : public BaseClass {
     for (int i = 0; i < P::AccRowsPerTh; ++i) {
 #pragma unroll
       for (int j = 0; j < P::AccColsPerTh; ++j) {
-        acc[i][j] = BaseClass::Zero;
+        acc[i][j] = AccT(0);
       }
     }
   }
@@ -252,13 +252,13 @@ struct PairwiseDistances : public BaseClass {
     if (tile_idx_n == blockIdx.x * P::Nblk) {
       for (int i = threadIdx.x; i < P::Mblk; i += P::Nthreads) {
         auto idx  = tile_idx_m + i;
-        sxNorm[i] = idx < this->m ? xn[idx] : 0;
+        sxNorm[i] = idx < this->m ? xn[idx] : DataT(0);
       }
     }
 
     for (int i = threadIdx.x; i < P::Nblk; i += P::Nthreads) {
       auto idx  = tile_idx_n + i;
-      syNorm[i] = idx < this->n ? yn[idx] : 0;
+      syNorm[i] = idx < this->n ? yn[idx] : DataT(0);
     }
     __syncthreads();
 
@@ -285,7 +285,7 @@ struct PairwiseDistances : public BaseClass {
         auto colId = startx + j * P::AccThCols;
         if (rowId < this->m && colId < this->n) {
           // Promote to 64 bit index for final write, as output array can be > 2^31
-          dOutput[std::size_t(rowId) * this->n + colId] = fin_op(acc[i][j], 0);
+          dOutput[0 * std::size_t(rowId) * this->n + 0 * colId] = fin_op(acc[i][j], 0);
         }
       }
     }

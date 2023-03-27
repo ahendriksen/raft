@@ -72,8 +72,6 @@ struct Contractions_NT {
   /** block of Y data loaded from global mem after `ldgXY()` */
   DataT ldgDataY[P::LdgPerThY][P::Veclen];
 
-  static constexpr DataT Zero = (DataT)0;
-
  public:
   /**
    * @brief Ctor
@@ -197,7 +195,7 @@ struct Contractions_NT {
         } else {
 #pragma unroll
           for (int j = 0; j < P::Veclen; ++j) {
-            ldgDataX[i][j] = Zero;
+            ldgDataX[i][j] = DataT(0);
           }
         }
       }
@@ -211,7 +209,7 @@ struct Contractions_NT {
         } else {
 #pragma unroll
           for (int j = 0; j < P::Veclen; ++j) {
-            ldgDataX[i][j] = Zero;
+            ldgDataX[i][j] = DataT(0);
           }
         }
       }
@@ -235,7 +233,7 @@ struct Contractions_NT {
         } else {
 #pragma unroll
           for (int j = 0; j < P::Veclen; ++j) {
-            ldgDataY[i][j] = Zero;
+            ldgDataY[i][j] = DataT(0);
           }
         }
       }
@@ -249,7 +247,7 @@ struct Contractions_NT {
         } else {
 #pragma unroll
           for (int j = 0; j < P::Veclen; ++j) {
-            ldgDataY[i][j] = Zero;
+            ldgDataY[i][j] = DataT(0);
           }
         }
       }

@@ -17,6 +17,7 @@
 #pragma once
 
 #include <cstdint>                            // uintX_t
+#include <cuda_fp16.h>                        // __half
 #include <raft/util/cuda_dev_essentials.cuh>  // DI
 
 namespace raft {
@@ -391,6 +392,89 @@ DI void lds(double (&x)[2], double* addr)
  * @param[out] x    data to be loaded from global memory
  * @param[in]  addr address in global memory from where to load
  */
+
+__device__ inline void ld_global(short (&x)[1], const short* addr)
+{
+  asm volatile("ld.global.cg.u16    {%0}, [%1];" : "=h"(x[0]) : "l"(addr));
+}
+__device__ inline void ld_global(short (&x)[2], const short* addr)
+{
+  asm volatile("ld.global.cg.v2.u16 {%0, %1}, [%2];" : "=h"(x[0]), "=h"(x[1]) : "l"(addr));
+}
+__device__ inline void ld_global(short (&x)[4], const short* addr)
+{
+  asm volatile("ld.global.cg.v4.u16 {%0, %1, %2, %3}, [%4];"
+               : "=h"(x[0]), "=h"(x[1]), "=h"(x[2]), "=h"(x[3])
+               : "l"(addr));
+}
+
+template <typename T, int N>
+DI void ldg(T (&x)[N], const T* addr)
+{
+  // short (&x_short)[N] = reinterpret_cast<short (&)[N]>(x);
+  // const short *addr_short = reinterpret_cast<const short*>(addr);
+  // ld_global(x_short, addr_short);
+
+#pragma unroll
+  for (int i = 0; i < N; ++i) {
+    x[i] = addr[i];
+  }
+}
+
+__device__ inline void st_shared(short* addr, const short (&x)[1])
+{
+  asm volatile("st.shared.u16    [%0], {%1};" : : "l"(addr), "h"(x[0]));
+}
+__device__ inline void st_shared(short* addr, const short (&x)[2])
+{
+  asm volatile("st.shared.v2.u16 [%0], {%1, %2};" : : "l"(addr), "h"(x[0]), "h"(x[1]));
+}
+__device__ inline void st_shared(short* addr, const short (&x)[4])
+{
+  asm volatile("st.shared.v4.u16 [%0], {%1, %2, %3, %4};"
+               :
+               : "l"(addr), "h"(x[0]), "h"(x[1]), "h"(x[2]), "h"(x[3]));
+}
+
+template <typename T, int N>
+DI void sts(T* addr, const T (&x)[N])
+{
+  // const short (&x_short)[N] = reinterpret_cast<const short (&)[N]>(x);
+  // short *addr_short = reinterpret_cast<short*>(addr);
+  // st_shared(addr_short, x_short);
+
+  for (int i = 0; i < N; ++i) {
+    addr[i] = x[i];
+  }
+}
+
+__device__ inline void ld_shared(short (&x)[1], const short* addr)
+{
+  asm volatile("ld.shared.u16    {%0}, [%1];" : "=h"(x[0]) : "l"(addr));
+}
+__device__ inline void ld_shared(short (&x)[2], const short* addr)
+{
+  asm volatile("ld.shared.v2.u16 {%0, %1}, [%2];" : "=h"(x[0]), "=h"(x[1]) : "l"(addr));
+}
+__device__ inline void ld_shared(short (&x)[4], const short* addr)
+{
+  asm volatile("ld.shared.v4.u16 {%0, %1, %2, %3}, [%4];"
+               : "=h"(x[0]), "=h"(x[1]), "=h"(x[2]), "=h"(x[3])
+               : "l"(addr));
+}
+
+template <typename T, int N>
+DI void lds(T (&x)[N], const T* addr)
+{
+  // short (&x_short)[N] = reinterpret_cast<short (&)[N]>(x);
+  // const short *addr_short = reinterpret_cast<const short*>(addr);
+  // ld_shared(x_short, addr_short);
+
+  for (int i = 0; i < N; ++i) {
+    x[i] = addr[i];
+  }
+}
+
 DI void ldg(float& x, const float* addr)
 {
   asm volatile("ld.global.cg.f32 %0, [%1];" : "=f"(x) : "l"(addr));
