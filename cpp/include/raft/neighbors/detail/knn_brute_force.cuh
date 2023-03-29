@@ -89,16 +89,6 @@ void tiled_brute_force_knn(const raft::device_resources& handle,
   auto pairwise_metric = metric;
   rmm::device_uvector<ElementType> search_norms(0, stream);
   rmm::device_uvector<ElementType> index_norms(0, stream);
-  if (metric == raft::distance::DistanceType::L2Expanded ||
-      metric == raft::distance::DistanceType::L2SqrtExpanded) {
-    search_norms.resize(m, stream);
-    index_norms.resize(n, stream);
-    raft::linalg::rowNorm(
-      search_norms.data(), search, d, m, raft::linalg::NormType::L2Norm, true, stream);
-    raft::linalg::rowNorm(
-      index_norms.data(), index, d, n, raft::linalg::NormType::L2Norm, true, stream);
-    pairwise_metric = raft::distance::DistanceType::InnerProduct;
-  }
 
   // if we're tiling over columns, we need additional buffers for temporary output
   // distances/indices
@@ -153,43 +143,19 @@ void tiled_brute_force_knn(const raft::device_resources& handle,
                                                     pairwise_metric,
                                                     true,
                                                     metric_arg);
-      if (metric == raft::distance::DistanceType::L2Expanded ||
-          metric == raft::distance::DistanceType::L2SqrtExpanded) {
-        auto row_norms = search_norms.data();
-        auto col_norms = index_norms.data();
-        auto dist      = temp_distances.data();
 
+      // If we have a distance epilogue - run it now
+      if constexpr (!std::is_same_v<DistanceEpilogue, raft::identity_op>) {
+        auto distances_ptr = temp_distances.data();
         raft::linalg::map_offset(
           handle,
-          raft::make_device_vector_view(dist, current_query_size * current_centroid_size),
-          [=] __device__(IndexType idx) {
+          raft::make_device_vector_view(temp_distances.data(),
+                                        current_query_size * current_centroid_size),
+          [=] __device__(size_t idx) {
             IndexType row = i + (idx / current_centroid_size);
             IndexType col = j + (idx % current_centroid_size);
-
-            auto val = row_norms[row] + col_norms[col] - 2.0 * dist[idx];
-
-            // due to numerical instability (especially around self-distance)
-            // the distances here could be slightly negative, which will
-            // cause NaN values in the subsequent sqrt. Clamp to 0
-            val = val * (val >= 0.0001);
-            if (metric == raft::distance::DistanceType::L2SqrtExpanded) { val = sqrt(val); }
-            val = distance_epilogue(val, row, col);
-            return val;
+            return distance_epilogue(distances_ptr[idx], row, col);
           });
-      } else {
-        // if we're not l2 distance, and we have a distance epilogue - run it now
-        if constexpr (!std::is_same_v<DistanceEpilogue, raft::identity_op>) {
-          auto distances_ptr = temp_distances.data();
-          raft::linalg::map_offset(
-            handle,
-            raft::make_device_vector_view(temp_distances.data(),
-                                          current_query_size * current_centroid_size),
-            [=] __device__(size_t idx) {
-              IndexType row = i + (idx / current_centroid_size);
-              IndexType col = j + (idx % current_centroid_size);
-              return distance_epilogue(distances_ptr[idx], row, col);
-            });
-        }
       }
 
       select_k<IndexType, ElementType>(temp_distances.data(),
