@@ -25,6 +25,7 @@
 #include <raft/distance/detail/distance_ops/cosine.cuh>
 #include <raft/distance/detail/distance_ops/hamming.cuh>
 #include <raft/distance/detail/distance_ops/hellinger.cuh>
+#include <raft/distance/detail/distance_ops/inner_product.cuh>
 #include <raft/distance/detail/distance_ops/jensen_shannon.cuh>
 #include <raft/distance/detail/distance_ops/kl_divergence.cuh>
 #include <raft/distance/detail/distance_ops/l1.cuh>

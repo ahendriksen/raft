@@ -152,7 +152,7 @@ void knn(raft::device_resources const& handle,
          raft::device_matrix_view<const value_t, matrix_idx, search_layout> search,
          raft::device_matrix_view<idx_t, matrix_idx, row_major> indices,
          raft::device_matrix_view<value_t, matrix_idx, row_major> distances,
-         distance::DistanceType metric         = distance::DistanceType::L2Unexpanded,
+         distance::DistanceType metric         = distance::DistanceType::L2Expanded,
          std::optional<float> metric_arg       = std::make_optional<float>(2.0f),
          std::optional<idx_t> global_id_offset = std::nullopt,
          epilogue_op distance_epilogue         = raft::identity_op())

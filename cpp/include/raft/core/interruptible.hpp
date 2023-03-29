@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <chrono>
 #include <memory>
 #include <mutex>
 #include <optional>
@@ -286,12 +287,14 @@ class interruptible {
   template <typename Query, typename Object>
   inline void synchronize_impl(Query query, Object object)
   {
+    using namespace std::chrono_literals;
     cudaError_t query_result;
     while (true) {
       yield_impl();
       query_result = query(object);
       if (query_result != cudaErrorNotReady) { break; }
-      std::this_thread::yield();
+      std::this_thread::sleep_for(100ms);
+      // std::this_thread::yield();
     }
     RAFT_CUDA_TRY(query_result);
   }

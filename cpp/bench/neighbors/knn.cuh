@@ -24,9 +24,8 @@
 #include <raft/neighbors/ivf_pq.cuh>
 #include <raft/spatial/knn/knn.cuh>
 
-#if defined RAFT_COMPILED
+#include <raft/distance/specializations.cuh>
 #include <raft/neighbors/specializations.cuh>
-#endif
 
 #include <rmm/mr/device/managed_memory_resource.hpp>
 #include <rmm/mr/device/per_device_resource.hpp>
@@ -211,6 +210,7 @@ struct brute_force_knn {
   {
     std::vector<ValT*> input{index};
     std::vector<size_t> sizes{ps.n_samples};
+
     raft::spatial::knn::brute_force_knn<IdxT, ValT, size_t>(handle,
                                                             input,
                                                             sizes,

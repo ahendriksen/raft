@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018-2022, NVIDIA CORPORATION.
+ * Copyright (c) 2018-2023, NVIDIA CORPORATION.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,7 +69,7 @@ struct PairwiseDistanceGemm {
     cutlass::gemm::GemmShape<16, 8, 4>;  // <- MMA Op tile M = 16, N = 8, K = 4
 
   /// Operation performed by GEMM
-  using Operator = cutlass::arch::OpMultiplyAddFastF32;
+  using Operator = cutlass::arch::OpMultiplyAdd;
 
   // This code section describes whether you want to use tensor cores or regular SIMT cores on GPU
   // SM

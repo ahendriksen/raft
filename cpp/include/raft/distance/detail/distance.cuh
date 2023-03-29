@@ -275,18 +275,15 @@ void distance_impl(raft::resources const& handle,
                    bool is_row_major,
                    DataT)  // metric_arg unused
 {
+  ops::inner_product_distance_op<DataT, AccT, IdxT> distance_op{};
+
+  const DataT* x_norm = nullptr;
+  const DataT* y_norm = nullptr;
+
   cudaStream_t stream = raft::resource::get_cuda_stream(handle);
-  raft::linalg::gemm(handle,
-                     out,
-                     const_cast<DataT*>(x),
-                     const_cast<DataT*>(y),
-                     m,
-                     n,
-                     k,
-                     !is_row_major,
-                     !is_row_major,
-                     is_row_major,
-                     stream);
+
+  pairwise_matrix_dispatch<decltype(distance_op), DataT, AccT, OutT, FinOpT, IdxT>(
+    distance_op, m, n, k, x, y, x_norm, y_norm, out, fin_op, stream, is_row_major);
 }
 
 template <typename DataT, typename AccT, typename OutT, typename FinOpT, typename IdxT = int>

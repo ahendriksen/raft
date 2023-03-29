@@ -124,18 +124,36 @@ if(BUILD_BENCH)
     NAME
     NEIGHBORS_BENCH
     PATH
-    bench/neighbors/knn/brute_force_float_int64_t.cu
+    # bench/neighbors/knn/brute_force_float_int64_t.cu
     bench/neighbors/knn/brute_force_float_uint32_t.cu
-    bench/neighbors/knn/ivf_flat_float_int64_t.cu
-    bench/neighbors/knn/ivf_flat_int8_t_int64_t.cu
-    bench/neighbors/knn/ivf_flat_uint8_t_int64_t.cu
-    bench/neighbors/knn/ivf_pq_float_int64_t.cu
-    bench/neighbors/knn/ivf_pq_int8_t_int64_t.cu
-    bench/neighbors/knn/ivf_pq_uint8_t_int64_t.cu
-    bench/neighbors/refine_float_int64_t.cu
-    bench/neighbors/refine_uint8_t_int64_t.cu
+    bench/neighbors/knn/brute_force_knn_spec.cu
+    src/neighbors/specializations/fused_l2_knn_long_float_false.cu
+    src/distance/specializations/detail/canberra_float_float_float_int.cu
+    src/distance/specializations/detail/correlation_float_float_float_int.cu
+    src/distance/specializations/detail/cosine_float_float_float_int.cu
+    src/distance/specializations/detail/hamming_unexpanded_float_float_float_int.cu
+    src/distance/specializations/detail/hellinger_expanded_float_float_float_int.cu
+    src/distance/specializations/detail/inner_product_float_float_float_int.cu
+    src/distance/specializations/detail/jensen_shannon_float_float_float_int.cu
+    src/distance/specializations/detail/kernels/gram_matrix_base_float.cu
+    src/distance/specializations/detail/kernels/polynomial_kernel_float_int.cu
+    # These are somehow missing a kernel definition which is causing a compile error.
+    # src/distance/specializations/detail/kernels/rbf_kernel_float.cu
+    src/neighbors/brute_force_knn_int64_t_float.cu
+    src/distance/specializations/detail/kernels/tanh_kernel_float.cu
+    src/distance/specializations/detail/kl_divergence_float_float_float_int.cu
+    src/distance/specializations/detail/l1_float_float_float_int.cu
+    src/distance/specializations/detail/l2_expanded_float_float_float_int.cu
+    src/distance/specializations/detail/l2_unexpanded_float_float_float_int.cu
+    src/distance/specializations/detail/l_inf_float_float_float_int.cu
+    src/distance/specializations/detail/lp_unexpanded_float_float_float_int.cu
+    src/distance/specializations/detail/russel_rao_float_float_float_int.cu
+    # bench/neighbors/knn/ivf_flat_float_int64_t.cu bench/neighbors/knn/ivf_flat_int8_t_int64_t.cu
+    # bench/neighbors/knn/ivf_flat_uint8_t_int64_t.cu bench/neighbors/knn/ivf_pq_float_int64_t.cu
+    # bench/neighbors/knn/ivf_pq_int8_t_int64_t.cu bench/neighbors/knn/ivf_pq_uint8_t_int64_t.cu
+    # bench/neighbors/refine_float_int64_t.cu bench/neighbors/refine_uint8_t_int64_t.cu
     bench/main.cpp
     OPTIONAL
-    LIB
+    # LIB
   )
 endif()
