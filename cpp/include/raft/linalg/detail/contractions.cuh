@@ -194,7 +194,12 @@ struct Contractions_NT {
       auto koffset = kidx + scolid;
 #pragma unroll
       for (int i = 0; i < P::LdgPerThX; ++i) {
-        if (koffset < lda && (xrowid + i * P::LdgRowsX) < numRows) {
+        // XXX: This could lead to bugs if k is not a multiple of veclen and the
+        // values between k and lda are non-zero. In that case, some bogus
+        // values could be loaded that are taken into account in distance
+        // calculations (for instance). Currently, the pairwise distance api
+        // sets k equal to lda, so this issue does not pop up.
+        if (koffset < k && (xrowid + i * P::LdgRowsX) < numRows) {
           ldg(ldgDataX[i], x + i * P::LdgRowsX * lda + koffset);
         } else {
 #pragma unroll
@@ -204,11 +209,12 @@ struct Contractions_NT {
         }
       }
     } else {
+      const auto numCols = m;
       const auto numRows = k;
       auto koffset       = scolid;
 #pragma unroll
       for (int i = 0; i < P::LdgPerThX; ++i) {
-        if ((koffset + xrowid) < lda && (srowid + kidx + i * P::LdgRowsX) < numRows) {
+        if ((koffset + xrowid) < numCols && (srowid + kidx + i * P::LdgRowsX) < numRows) {
           ldg(ldgDataX[i], x + (kidx + i * P::LdgRowsX) * lda + koffset);
         } else {
 #pragma unroll
@@ -232,7 +238,12 @@ struct Contractions_NT {
       auto koffset = kidx + scolid;
 #pragma unroll
       for (int i = 0; i < P::LdgPerThY; ++i) {
-        if (koffset < ldb && (yrowid + i * P::LdgRowsY) < numRows) {
+        // XXX: This could lead to bugs if k is not a multiple of veclen and the
+        // values between k and ldb are non-zero. In that case, some bogus
+        // values could be loaded that are taken into account in distance
+        // calculations (for instance). Currently, the pairwise distance api
+        // sets k equal to ldb, so this issue does not pop up.
+        if (koffset < k && (yrowid + i * P::LdgRowsY) < numRows) {
           ldg(ldgDataY[i], y + i * P::LdgRowsY * ldb + koffset);
         } else {
 #pragma unroll
