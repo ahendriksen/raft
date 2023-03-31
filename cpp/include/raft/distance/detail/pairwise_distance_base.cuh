@@ -68,7 +68,8 @@ template <typename DataT,
           typename BaseClass = raft::linalg::Contractions_NT<DataT, IdxT, Policy, isRowMajor>>
 struct PairwiseDistances : public BaseClass {
   // Get accumulation type from distance_op
-  using AccT = typename OpT::AccT;
+  using AccT    = typename OpT::AccT;
+  using StrideT = IdxT;
 
  private:
   typedef Policy P;
@@ -96,9 +97,9 @@ struct PairwiseDistances : public BaseClass {
                        IdxT _m,
                        IdxT _n,
                        IdxT _k,
-                       IdxT _lda,
-                       IdxT _ldb,
-                       IdxT _ldd,
+                       StrideT _lda,
+                       StrideT _ldb,
+                       StrideT _ldd,
                        const DataT* _xn,
                        const DataT* _yn,
                        OutT* _dOutput,
