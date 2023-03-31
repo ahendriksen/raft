@@ -189,7 +189,7 @@ struct Contractions_NT {
     IdxT xrowid = isRowMajor ? tile_idx_m + srowid : tile_idx_m;
     auto x      = isRowMajor ? x_base + xrowid * lda : x_base + xrowid + srowid * lda;
 
-    if (isRowMajor) {
+    if constexpr (isRowMajor) {
       auto numRows = m;
       auto koffset = kidx + scolid;
 #pragma unroll
@@ -227,7 +227,7 @@ struct Contractions_NT {
     IdxT yrowid = isRowMajor ? tile_idx_n + srowid : tile_idx_n;
     auto y      = isRowMajor ? y_base + yrowid * ldb : y_base + yrowid + srowid * ldb;
 
-    if (isRowMajor) {
+    if constexpr (isRowMajor) {
       auto numRows = end_n;
       auto koffset = kidx + scolid;
 #pragma unroll
@@ -278,7 +278,7 @@ struct Contractions_NT {
 
   DI void ldsX(int kidx, DataT* smem)
   {
-    if (isRowMajor) {
+    if constexpr (isRowMajor) {
       auto* saddr = smem + accrowid * P::SmemStride + kidx;
 #pragma unroll
       for (int i = 0; i < P::AccRowsPerTh; ++i) {
@@ -298,7 +298,7 @@ struct Contractions_NT {
 
   DI void ldsY(int kidx, DataT* smem)
   {
-    if (isRowMajor) {
+    if constexpr (isRowMajor) {
       auto* saddr = smem + acccolid * P::SmemStride + kidx;
 #pragma unroll
       for (int i = 0; i < P::AccColsPerTh; ++i) {
