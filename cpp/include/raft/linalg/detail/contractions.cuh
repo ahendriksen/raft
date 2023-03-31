@@ -24,6 +24,8 @@ namespace detail {
 
 template <typename DataT, typename IdxT, typename Policy, bool isRowMajor = true>
 struct Contractions_NT {
+  using StrideT = IdxT;
+
  protected:
   typedef Policy P;
 
@@ -34,11 +36,11 @@ struct Contractions_NT {
   /** number of columns in X and Y */
   IdxT k;
   /** leading dimension in X */
-  IdxT lda;
+  StrideT lda;
   /** leading dimension in Y */
-  IdxT ldb;
+  StrideT ldb;
   /** leading dimension in Output D */
-  IdxT ldd;
+  StrideT ldd;
 
   /** global memory pointer to X matrix */
   const DataT* x_base;
@@ -117,9 +119,9 @@ struct Contractions_NT {
                      IdxT _m,
                      IdxT _n,
                      IdxT _k,
-                     IdxT _lda,
-                     IdxT _ldb,
-                     IdxT _ldd,
+                     StrideT _lda,
+                     StrideT _ldb,
+                     StrideT _ldd,
                      char* _smem)
     : m(_m),
       n(_n),
