@@ -24,7 +24,7 @@ namespace detail {
 
 template <typename DataT, typename IdxT, typename Policy, bool isRowMajor = true>
 struct Contractions_NT {
-  using StrideT = IdxT;
+  using StrideT = int64_t;
 
  protected:
   typedef Policy P;

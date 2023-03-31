@@ -19,12 +19,14 @@ namespace raft::distance::detail {
 
 template <typename IdxT, typename DataT, typename OutT, typename FinOpT>
 struct pairwise_matrix_params {
+  using StrideT = int64_t;
+
   IdxT m;
   IdxT n;
   IdxT k;
-  IdxT ldx;
-  IdxT ldy;
-  IdxT ld_out;
+  StrideT ldx;
+  StrideT ldy;
+  StrideT ld_out;
   const DataT* x;
   const DataT* y;
   const DataT* x_norm;

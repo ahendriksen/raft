@@ -69,7 +69,7 @@ template <typename DataT,
 struct PairwiseDistances : public BaseClass {
   // Get accumulation type from distance_op
   using AccT    = typename OpT::AccT;
-  using StrideT = IdxT;
+  using StrideT = int64_t;
 
  private:
   typedef Policy P;
