@@ -26,7 +26,7 @@ constexpr bool row_major = true;
 using DataT              = float;
 using AccT               = float;
 using OutT               = DataT;
-using IdxT               = int;
+using IdxT               = int64_t;
 
 using FinOpT = raft::identity_op;
 
