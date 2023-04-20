@@ -368,4 +368,27 @@ if(BUILD_TESTS)
     NAME UTILS_TEST PATH test/core/seive.cu test/util/bitonic_sort.cu test/util/cudart_utils.cpp
     test/util/device_atomics.cu test/util/integer_utils.cpp test/util/pow2_utils.cu
   )
+
+  add_custom_target(ALL_TESTS)
+  add_dependencies(
+    ALL_TESTS
+    CLUSTER_TEST
+    CORE_TEST
+    DISTANCE_TEST
+    EXT_HEADERS_TEST_COMPILED_EXPLICIT
+    EXT_HEADERS_TEST_COMPILED_IMPLICIT
+    EXT_HEADERS_TEST_IMPLICIT
+    LABEL_TEST
+    LINALG_TEST
+    MATRIX_TEST
+    NEIGHBORS_TEST
+    RANDOM_TEST
+    SOLVERS_TEST
+    SPARSE_DIST_TEST
+    SPARSE_NEIGHBORS_TEST
+    SPARSE_TEST
+    STATS_TEST
+    UTILS_TEST
+  )
+
 endif()
